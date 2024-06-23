@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://cdn.maptiler.com/maplibre-gl-js/v1.14.0/maplibre-gl.js"></script>
+    <link href="https://cdn.maptiler.com/maplibre-gl-js/v1.14.0/maplibre-gl.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="index.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="map">
+        <a href="https://www.maptiler.com" style="position: absolute; left: 10px; bottom: 10px; z-index: 999">
+            <img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo" />
+        </a>
+    </div>
+    <p>
+        <a href="https://www.maptiler.com/copyright/" target="_blank">© MapTiler</a>
+        <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>
+    </p>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var apiKey = 'qpUlpIrULj5awDPNsLKO';
+        var styleId = 'a8fb0886-b430-4036-8407-f2ee5184bf82';
+
+        var addPopup = function (e, label, image) {
+            popup?.remove();
+
+            var feature = e.features[0];
+            if (feature && feature.properties) {
+                var name = feature.properties['name'] || 'unknown';
+                var hours = feature.properties['hours'] || 'unknown';
+                var distance = feature.properties['distance'];
+
+                var content = `<div class="card" style="width: 14rem;">
+                        <img src="${image}" class="card-img-top" alt="bicycle">
+                        <div class="card-body">
+                            <h5 class="card-title">${name}</h5>
+                            <p class="fw-bold">${label}</p>
+                            <p class="card-text">${hours}</p>
+                            <p class="fw-lighter">Distancia desde la cicloruta: ${distance} m</p>
+                        </div>
+                    </div>`
+
+                var opts = {
+                    maxWidth: 'none'
+                };
+                popup = new maplibregl.Popup(opts)
+                    .setLngLat(e.lngLat)
+                    .setHTML(content)
+                    .addTo(map);
+            }
+        }
+
+        var popup;
+
+        let styleURL = `https://api.maptiler.com/maps/${styleId}/style.json?key=${apiKey}`;
+        var map = new maplibregl.Map({
+            container: 'map',
+            style: styleURL,
+            zoom: 11,
+            center: [
+                -58.377,
+                -34.608
+            ]
+        });
+
+        // Add navigation control (the +/- zoom buttons)
+        map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+        // Bike sharing places
+        map.on('click', 'bike-sharing-label', (e) => {
+            addPopup(e, 'Estaci&oacute;n Bicicletas Compartidas', 'https://i0.hippopx.com/photos/663/591/813/bicycles-city-bicycles-luggage-rack-bike-lights-preview.jpg');
+        });
+
+        // Bike shops
+        map.on('click', 'bike-shop-label', (e) => {
+            addPopup(e, 'Tienda de Bicicletas', 'https://i0.hippopx.com/photos/199/363/596/places-restaurant-cafe-shop-preview.jpg');
+        });
+
+    </script>
+</body>
+
+</html>
